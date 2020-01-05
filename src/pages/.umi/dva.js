@@ -20,8 +20,8 @@ export function _onCreate() {
     app.use(plugin);
   });
   
-  app.model({ namespace: 'counter', ...(require('G:/代码/个人代码/github仓库/umi/umi-examples/typescript/src/models/counter.ts').default) });
-app.model({ namespace: 'global', ...(require('G:/代码/个人代码/github仓库/umi/umi-examples/typescript/src/models/global.ts').default) });
+  app.model({ namespace: 'counter', ...(require('F:/代码/个人代码/github/react-example/src/models/counter.ts').default) });
+app.model({ namespace: 'global', ...(require('F:/代码/个人代码/github/react-example/src/models/global.ts').default) });
   return app;
 }
 

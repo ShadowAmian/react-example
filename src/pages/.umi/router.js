@@ -22,6 +22,11 @@ const routes = [
         component: require('../index.tsx').default,
       },
       {
+        path: '/malfunction',
+        exact: true,
+        component: require('../malfunction/index.tsx').default,
+      },
+      {
         path: '/users',
         exact: true,
         component: require('../users.tsx').default,
@@ -29,7 +34,7 @@ const routes = [
       {
         component: () =>
           React.createElement(
-            require('G:/代码/个人代码/github仓库/umi/umi-examples/typescript/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
+            require('F:/代码/个人代码/github/react-example/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
               .default,
             { pagesPath: 'src/pages', hasRoutesInConfig: false },
           ),
@@ -39,7 +44,7 @@ const routes = [
   {
     component: () =>
       React.createElement(
-        require('G:/代码/个人代码/github仓库/umi/umi-examples/typescript/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
+        require('F:/代码/个人代码/github/react-example/node_modules/umi-build-dev/lib/plugins/404/NotFound.js')
           .default,
         { pagesPath: 'src/pages', hasRoutesInConfig: false },
       ),
