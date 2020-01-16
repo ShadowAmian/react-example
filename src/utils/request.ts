@@ -1,56 +1,81 @@
-/**
- * request 网络请求工具
- * 更详细的 api 文档: https://github.com/umijs/umi-request
- */
-import { extend } from 'umi-request';
-import { notification } from 'antd';
+ import axios from 'axios';
+ // import store from '../store/index';
+ // import { getSessionId } from '@/utils/auth';
 
-const codeMessage = {
-  200: '服务器成功返回请求的数据。',
-  201: '新建或修改数据成功。',
-  202: '一个请求已经进入后台排队（异步任务）。',
-  204: '删除数据成功。',
-  400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
-  401: '用户没有权限（令牌、用户名、密码错误）。',
-  403: '用户得到授权，但是访问是被禁止的。',
-  404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
-  406: '请求的格式不可得。',
-  410: '请求的资源被永久删除，且不会再得到的。',
-  422: '当创建一个对象时，发生一个验证错误。',
-  500: '服务器发生错误，请检查服务器。',
-  502: '网关错误。',
-  503: '服务不可用，服务器暂时过载或维护。',
-  504: '网关超时。',
-};
+ /* 防止重复提交，利用axios的cancelToken */
+ let pending: any[] = []; // 声明一个数组用于存储每个ajax请求的取消函数和ajax标识
+ const CancelToken: any = axios.CancelToken;
 
-/**
- * 异常处理程序
- */
-const errorHandler = (error: { response: Response }): Response => {
-  const { response } = error;
-  if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
 
-    notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
-    });
-  } else if (!response) {
-    notification.error({
-      description: '您的网络发生异常，无法连接服务器',
-      message: '网络异常',
-    });
-  }
-  return response;
-};
 
-/**
- * 配置request请求时的默认参数
- */
-const request = extend({
-  errorHandler, // 默认错误处理
-  credentials: 'include', // 默认请求是否带上cookie
-});
+ const removePending: any = (config: any, f: any) => {
+     // 获取请求的url
+     const flagUrl = config.url;
+     // 判断该请求是否在请求队列中
+     if (pending.indexOf(flagUrl) !== -1) {
+         // 如果在请求中，并存在f,f即axios提供的取消函数
+         if (f) {
+             f('取消重复请求'); // 执行取消操作
+         } else {
+             pending.splice(pending.indexOf(flagUrl), 1); // 把这条记录从数组中移除
+         }
+     } else {
+         // 如果不存在在请求队列中，加入队列
+         if (f) {
+             pending.push(flagUrl);
+         }
+     }
+ };
 
-export default request;
+ /* 创建axios实例 */
+ const service = axios.create({
+     timeout: 5000, // 请求超时时间
+ });
+
+ /* request拦截器 */
+ service.interceptors.request.use((config: any) => {
+     // neverCancel 配置项，允许多个请求
+     if (!config.neverCancel) {
+         // 生成cancelToken
+         config.cancelToken = new CancelToken((c: any) => {
+             removePending(config, c);
+         });
+     }
+     // 在这里可以统一修改请求头，例如 加入 用户 token 等操作
+     return config;
+ }, (error: any) => {
+     Promise.reject(error);
+ });
+
+ /* respone拦截器 */
+ service.interceptors.response.use(
+     (response: any) => {
+         // 移除队列中的该请求，注意这时候没有传第二个参数f
+         removePending(response.config);
+         // 获取返回数据，并处理。按自己业务需求修改。下面只是个demo
+         const res = response.data;
+         if (res.code !== 200) {
+             if (res.code === 401) {
+                 if (location.hash === '#/') {
+                     return res;
+                 } else {
+                     location.href = '/#/';
+                 }
+             }
+             return Promise.reject('error');
+         } else {
+             return response;
+         }
+     },
+     (error: any) => {
+         // 异常处理
+         console.log(error)
+         pending = [];
+         if (error.message === '取消重复请求') {
+             return Promise.reject(error);
+         }
+         return Promise.reject(error);
+     },
+ );
+
+ export default service;

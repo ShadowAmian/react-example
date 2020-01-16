@@ -1,5 +1,4 @@
 import withRouter from 'umi/withRouter';
-import dynamic from 'umi/dynamic';
 import { connect } from 'dva';
 
 function BasicLayout(props) {
