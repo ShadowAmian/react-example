@@ -1,1 +1,19 @@
 node_modules
+# production
+/dist
+/.vscode
+yarn.lock
+package-lock.json
+.vscode
+
+# visual studio code
+.history
+*.log
+functions/*
+.temp/**
+
+# umi
+.umi
+.umi-production
+
+build

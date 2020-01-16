@@ -1,6 +1,5 @@
 import React, { Fragment, FC } from "react";
 import Link from "umi/link";
-import Welcome from "@/components/Welcome";
 import styles from "./index.css";
 import { connect } from "dva";
 import { GlobalState, UmiComponentProps } from "@/common/type";
@@ -33,7 +32,6 @@ const page: FC<PageProps> = function(props) {
         <button onClick={handleAdd}>add</button>
         <button onClick={handleMinus}>minus</button>
       </div>
-      <Welcome />
       <Link to="/users">
         <button>go to /users</button>
       </Link>
