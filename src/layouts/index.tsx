@@ -4,7 +4,7 @@ import { connect } from 'dva';
 function BasicLayout(props) {
   return (
     <div>
-      <h2>Layouts</h2>
+      <h2>hello</h2>
       <h3>message from global model: {props.message}</h3>
       <hr />
       {
